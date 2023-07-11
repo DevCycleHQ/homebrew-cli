@@ -12,7 +12,9 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.AUTOMATION_USER_TOKEN }}
 
       - name: Set Node.js version
         uses: actions/setup-node@v2
@@ -29,16 +31,19 @@ jobs:
           echo "SHA: $SHA"
           echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
           echo "sha=$SHA" >> $GITHUB_OUTPUT
-          
+
       - name: Update formula
         run: |
           sed -i "s|url .*|url \"https://registry.npmjs.org/@devcycle/cli/-/cli-${{ steps.npm_data.outputs.latest_version }}.tgz\"|" Formula/Devcycle.rb
           sed -i "s|sha256 .*|sha256 \"${{ steps.npm_data.outputs.sha }}\"|" Formula/Devcycle.rb
 
-      - name: Commit and push
+      - name: Commit
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add -A
           git commit -m "Update to version ${{ steps.npm_data.outputs.latest_version }}"
-          git push
+
+      - name: Push
+        run: |
+          git push origin HEAD:main
