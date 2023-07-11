@@ -1,0 +1,44 @@
+name: Update Formula
+
+on:
+  repository_dispatch:
+    types: [start-deploy]
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set Node.js version
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Get latest version and shasum
+        id: npm_data
+        run: |
+          TARBALL_URL=$(npm show @devcycle/cli dist.tarball)
+          LATEST_VERSION=$(npm show @devcycle/cli version)
+          SHA=$(curl -Ls ${TARBALL_URL} | shasum -a 256 | awk '{print $1}')
+          echo "Latest version: $LATEST_VERSION" 
+          echo "SHA: $SHA"
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          
+      - name: Update formula
+        run: |
+          sed -i "s|url .*|url \"https://registry.npmjs.org/@devcycle/cli/-/cli-${{ steps.npm_data.outputs.latest_version }}.tgz\"|" Formula/Devcycle.rb
+          sed -i "s|sha256 .*|sha256 \"${{ steps.npm_data.outputs.sha }}\"|" Formula/Devcycle.rb
+
+      - name: Commit and push
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add -A
+          git commit -m "Update to version ${{ steps.npm_data.outputs.latest_version }}"
+          git push
