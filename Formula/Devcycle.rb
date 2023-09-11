@@ -2,8 +2,8 @@ require "language/node"
 class Devcycle < Formula
   desc "Your package description"
   homepage "https://github.com/DevCycleHQ/cli"
-  url "https://registry.npmjs.org/@devcycle/cli/-/cli-5.4.2.tgz"
-  sha256 "19ffd99cd03b39af5d094badf1675f01dad186810477959013d18a095e7c5817"
+  url "https://registry.npmjs.org/@devcycle/cli/-/cli-5.9.0.tgz"
+  sha256 "068ffd33b01c5d82974d06e9031f5f29ff85876ff473966d864866a04e9e4c07"
 
   depends_on "node"
 
