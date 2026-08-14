@@ -12,12 +12,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.AUTOMATION_USER_TOKEN }}
           fetch-depth: 0
       - name: Set Node.js version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v7
         with:
           node-version: '18'
 
